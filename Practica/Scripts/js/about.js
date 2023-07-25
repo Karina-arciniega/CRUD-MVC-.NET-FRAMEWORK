@@ -2,33 +2,48 @@
 
 $(document).ready(function () {
 
+    /** MANDA LOS DATOS DEL FORMULARIO AL PULSAE EL BOTON***/
     $("#frm").submit(function (e) {
         e.preventDefault();
 
-        url = "../Home/Registrar";
+        url = "Registrar";
 
         parametros = $(this).serialize();
         var form = $(this);
+        var campos_vacios = false;
 
-        $.post(url, parametros, function (data) {
+        form.find('input[type="text"], textarea').each(function () {
+            if ($(this).val() === '') {
+              campos_vacios = true;
+            }
+        });
 
-            var Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
+        if (!campos_vacios) {
+
+            $.post(url, parametros, function (data) {
+
+                var Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                })
+                console.log(data)
+                if (data == "True") {
+
+                    form[0].reset(); // Limpiar los campos del formulario
+                    tabla_spec.ajax.reload();
+                    Bien('Datos guardardos exitosamente')
+                }
+                else {
+                    form[0].reset();
+                    Mal('Ocurrio un error')
+                }
             })
-            console.log(data)
-            if (data == "True") {
 
-                form[0].reset(); // Limpiar los campos del formulario
-                tabla_spec.ajax.reload();
-                Bien('Datos guardardos exitosamente')
-            }
-            else {
-                form[0].reset();
-                Mal('Ocurrio un error')
-            }
-        })
+        }
+        else {
+            Mal('Algunos campos están vacíos')
+        }
     })
 
     tabla_spec = $('#TableSpecs').DataTable({
@@ -129,14 +144,22 @@ $(document).ready(function () {
 
     /*2. CURP */
 
+
     var inputCurp = document.getElementById('curp');
 
-    inputCurp.addEventListener('input', function () {
+    inputCurp.addEventListener('change', function () {
         var value = inputCurp.value;
 
+        console.log(value)
+        console.log(value.length)
         // Limitar la longitud del texto a 18 caracteres
-        if (value.length > 18) {
+        if (value.length >= 18) {
             inputCurp.value = value.slice(0, 18);
+        }
+        else {
+            // Si el correo electrónico no es válido, mostrar el mensaje de error
+            document.getElementsByName("curp")[0].value = ""
+            Mal('El campo CURP no es v\u00E1lido')
         }
 
         // Convertir el texto a mayúsculas
@@ -149,11 +172,11 @@ $("#tbody2").on("click", "button.info", async function () {
 
     var data = tabla_spec.row($(this).parents("tr")).data();
 
-    var n= document.getElementById("nombre").value = data.Nombre;
-    var n =document.getElementById("correo").value = data.Correo;
-    var n =document.getElementById("curp").value = data.CURP;
-    var n =document.getElementById("edad").value = data.Edad;
-    var n =document.getElementById("contrasena").value = data.Contrasena;
+    document.getElementById("nombre").value = data.Nombre;
+    document.getElementById("correo").value = data.Correo;
+    document.getElementById("curp").value = data.CURP;
+    document.getElementById("edad").value = data.Edad;
+    document.getElementById("contrasena").value = data.Contrasena;
 
     if (data.Genero === "Femenino") {
         document.getElementById('F').checked = true;
@@ -164,9 +187,9 @@ $("#tbody2").on("click", "button.info", async function () {
         document.getElementById('M').checked = true;
     }
 
-    var n = document.getElementById('genero').value
+    document.getElementById('genero').value
 
-    console.log(data.Rol)
+    
     if (data.Rol === "1") {
         document.getElementById("select").value = "1";
     }
@@ -174,53 +197,60 @@ $("#tbody2").on("click", "button.info", async function () {
         document.getElementById("select").value = "2";
     }
 
-    document.getElementById("estado").value = data.estado;
     document.getElementById("Id").value = data.Id;
 
-   
+    //if (data.estado === "1") {
+    //    document.getElementById('A').checked = true;
+    //    document.getElementById('D').checked = false;
+    //}
+    //else {
+    //    document.getElementById('A').checked = false;
+    //    document.getElementById('D').checked = true;
+    //}
+
+    //document.getElementById("estado").value = data.estado;
+   console.log(data)
 })
 
 $("#tbody2").on("click", "button.eliminar", async function () {
 
     var data = tabla_spec.row($(this).parents("tr")).data();
     var id = data.Id;
+    
+        Swal.fire({
+            title: '¿Estas seguro de eliminar definitivamente este usuario?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#005384',
+            cancelButtonColor: '#ef2026',
+            confirmButtonText: ' Si!',
 
-    console.log(id)
+        }).then((result) => {
+            if (result.isConfirmed) {
 
-    Swal.fire({
-        title: '¿Estas seguro de eliminar este usuario?',
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#005384',
-        cancelButtonColor: '#ef2026',
-        confirmButtonText: ' Si!',
+                jQuery.ajax({
+                    url: "EliminarUsuario" + "?id=" + id,
+                    type: "GET",
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
 
-    }).then((result) => {
-        if (result.isConfirmed) {
+                        if (data.resultado) {
 
-            jQuery.ajax({
-                url: "EliminarUsuario" + "?id=" + id,
-                type: "GET",
-                dataType: "json",
-                contentType: "application/json; charset=utf-8",
-                success: function (data) {
+                            tabla_spec.ajax.reload();
+                            tabla_spec.search('').draw();
 
-                    if (data.resultado) {
+                            Bien('Usuario desactivado temporalmente');
 
-                        tabla_spec.ajax.reload();
-                        tabla_spec.search('').draw();
+                        } else {
 
-                        Bien('Usuario eliminado');
+                            Mal('No se puedo eliminar');
 
-                    } else {
-
-                        Mal('No se puedo eliminar');
-
+                        }
                     }
-                }
-            });
-        }
-    })
+                });
+            }
+        })
 
 
 })
@@ -248,6 +278,19 @@ $('#M').click(function () {
         document.getElementById('genero').value = "Masculino";
     }
 });
+
+//$('#A').click(function () {
+//    if ($('#A').is(':checked')) {
+//        document.getElementById('D').checked = false;
+//        document.getElementById('estado').value = "1";
+//    }
+//});
+//$('#D').click(function () {
+//    if ($('#D').is(':checked')) {
+//        document.getElementById('A').checked = false;
+//        document.getElementById('estado').value = "0";
+//    }
+//});
 
 /* Sweet alert * */
 var Toast = Swal.mixin({

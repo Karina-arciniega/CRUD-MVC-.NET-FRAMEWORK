@@ -5,7 +5,7 @@
         $("#frm").submit(function (e) {
             e.preventDefault();
 
-            url = "../Home/Ingresar_Async";
+            url = "../Login/comprobarUsuario";
 
             parametros = $(this).serialize();
             $.post(url, parametros, function (data) {
@@ -19,16 +19,16 @@
                 if (data == "1") {
 
                     Toast.fire({
-                        title: 'WELCOME',
+                        title: 'BIENVENIDO',
                         icon: 'success'
                     });
 
-                    location.href = "../Home/About";
+                    location.href = "../CRUD/Index";
                 }
                 else {
 
                     Toast.fire({
-                        title: 'Invalid username or password',
+                        title: 'Usuario y/o contrase\u00F1a inv\u00E1lidos',
                         icon: 'error'
                         /* timer: 2000*/
                     });

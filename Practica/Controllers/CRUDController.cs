@@ -14,16 +14,12 @@ using System.Web.UI.WebControls;
 
 namespace Practica.Controllers
 {
-    public class HomeController : Controller
+    public class CRUDController : Controller
     {
-        /*Retornar la vista de login*/
-        public ActionResult Index()
-        {
-            return View();
-        }
+        
 
         /*Retornar la vista de about*/
-        public ActionResult About()
+        public ActionResult Index()
         {
             /*Comprueba si exise la cookie*/
             if (Request.Cookies["user"] != null)
@@ -32,9 +28,9 @@ namespace Practica.Controllers
             }
             else
             {
-                return RedirectToAction("Index");
+                return RedirectToAction("Login");
             }   
-           return View();
+          
         }
 
         /*Obtener tipos de usuarios*/
@@ -53,55 +49,7 @@ namespace Practica.Controllers
             return Json(lst, JsonRequestBehavior.AllowGet);
         }
 
-        /*Iniciar sesión*/
-
-        public async Task<ActionResult> Ingresar_Async(string correo, string pass)
-        {
-            var httClient = new HttpClient();
-
-            var url = "http://192.168.140.13/publicar/api/Access/ComprobarUsuariosGET2?correo="+correo+"&contrasena=" + pass;
-
-            var httpResponse = await httClient.GetAsync(url);
-
-            if (httpResponse.IsSuccessStatusCode)
-            {
-                var result = await httpResponse.Content.ReadAsStringAsync();
-
-                var use = JsonConvert.DeserializeObject<List<User>>(result);
-
-
-                string u = use[0].nombre;
-                string tt = use[0].rol;
-                string c = use[0].correo;
-                
-
-                u = Regex.Replace(u.Normalize(NormalizationForm.FormD), @"[^a-zA-z0-9 ]+", "");
-
-                HttpCookie cookie = new HttpCookie("user", u);
-                cookie.Expires = DateTime.Now.AddHours(1);
-                HttpContext.Response.Cookies.Add(cookie);
-
-                HttpCookie cookie2 = new HttpCookie("tipo", tt);
-                cookie2.Expires = DateTime.Now.AddHours(1);
-                HttpContext.Response.Cookies.Add(cookie2);
-
-                HttpCookie cookie3 = new HttpCookie("correo", c);
-                cookie3.Expires = DateTime.Now.AddHours(1);
-                HttpContext.Response.Cookies.Add(cookie3);
-
-                Session["user"] = u;
-
-                string response = "1";
-
-                return Content(response);
-
-            }
-            else
-            {
-                return Content("Usuario invalido");
-            }
-        }
-
+        /*Registra y actualiza usuarios*/
         public async Task<Boolean> Registrar(T_Usuarios user)
         {
             bool respuesta = false;
@@ -125,7 +73,7 @@ namespace Practica.Controllers
                         user1.Genero = user.Genero;
                         user1.Rol = user.Rol;
                         user1.Contrasena = user.Contrasena;
-                        user1.estado = user.estado;
+                        //user1.estado = user.estado;
                        db.SaveChanges();
 
 
@@ -173,7 +121,7 @@ namespace Practica.Controllers
            
             try
             {
-                //T_Usuarios oPersona = new T_Usuarios();
+                T_Usuarios oPersona = new T_Usuarios();
 
                 //using (ApiEntities db = new ApiEntities())
                 //{
@@ -183,7 +131,7 @@ namespace Practica.Controllers
 
                 //    db.T_Usuarios.Remove(oPersona);
                 //    db.SaveChanges();
-                //    respuesta  = true;
+                //    respuesta = true;
                 //}
 
                 using (ApiEntities db = new ApiEntities())
@@ -191,7 +139,7 @@ namespace Practica.Controllers
                     var user = (from a in db.T_Usuarios where a.Id == id select a).FirstOrDefault();
 
                     user.estado = "0";
-                   
+
 
                     db.SaveChanges();
                 }
@@ -205,29 +153,6 @@ namespace Practica.Controllers
             return Json(new { resultado = respuesta }, JsonRequestBehavior.AllowGet);
         }
 
-        public void Cerrar()
-        {
-            HttpCookie cookie2 = new HttpCookie("user");
-            cookie2.Expires = DateTime.Now.AddDays(-1);
-            HttpContext.Response.Cookies.Add(cookie2);
-
-            HttpCookie cookie = new HttpCookie("tipo");
-            cookie.Expires = DateTime.Now.AddDays(-1);
-            HttpContext.Response.Cookies.Add(cookie);
-
-
-            HttpCookie cookie3 = new HttpCookie("correo");
-            cookie3.Expires = DateTime.Now.AddDays(-1);
-            HttpContext.Response.Cookies.Add(cookie3);
-
-            HttpContext.Response.AppendHeader("Cache-Control", "no-store");
-            HttpContext.Response.Cache.SetCacheability(HttpCacheability.NoCache);
-            HttpContext.Response.Cache.SetExpires(DateTime.Now.AddSeconds(-1));
-            HttpContext.Response.Cache.SetNoStore();
-
-            HttpContext.Session.Clear();
-            HttpContext.Response.Redirect("~/Home/Index");
-
-        }
+       
     }
 }

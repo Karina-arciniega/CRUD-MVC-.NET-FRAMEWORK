@@ -39,8 +39,8 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm bg-primary h-50 w-100 text-white">
         <div class="container">
 
-            <h3>Bienvenido @user </h3>
-            <a href="~/Home/Cerrar"> <i class="fa-solid fa-right-from-bracket" style="color:white"></i> </a>
+            <h3>Bienvenid@("@") @user </h3>
+            <a href="~/Login/Cerrar"> <i class="fa-solid fa-right-from-bracket" style="color:white"></i> </a>
         </div>
     </nav>
     <div class="container  ">
@@ -86,38 +86,38 @@
                         <div class="col-12 ">
 
                             <div class="input-group">
-                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre" onkeydown="return /[a-z, ]/i.test(event.key)" required />
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre" onkeydown="return /[a-z, ]/i.test(event.key)"  />
                             </div>
                         </div>
                         <div class="col-12">
 
                             <div class="input-group">
-                                <input type="email" class="form-control" id="correo" name="correo" placeholder="Correo" required />
+                                <input type="email" class="form-control" id="correo" name="correo" placeholder="Correo"  />
                             </div>
                         </div>
                         <div class="col-12">
 
                             <div class="input-group">
-                                <input type="text" class="form-control" id="curp" name="curp" placeholder="CURP" required />
+                                <input type="text" class="form-control" id="curp" name="curp" placeholder="CURP"  />
                             </div>
                         </div>
                         <div class="col-12">
 
                             <div class="input-group">
-                                <input type="number" class="form-control" id="edad" name="edad" placeholder="Edad" required />
+                                <input type="number" class="form-control" id="edad" name="edad" placeholder="Edad"  />
                             </div>
                         </div>
 
                         <div class="col-12">
 
                             <div class="input-group">
-                                <input type="text" class="form-control" id="contrasena" name="contrasena" placeholder="Contraseña" required />
+                                <input type="text" class="form-control" id="contrasena" name="contrasena" placeholder="Contraseña"  />
                             </div>
                         </div>
 
-                        <input type="hidden" name="Id" value="0" id="Id" required />
-                        <input type="hidden" name="genero" value="Femenino" id="genero" required />
-                        <input type="hidden" name="estado" value="1" id="estado" required />
+                        <input type="hidden" name="Id" value="0" id="Id"  />
+                        <input type="hidden" name="genero" value="Femenino" id="genero"  />
+
 
                         <div class="col-12">
                             <label class="form-check-label" for="">
@@ -143,10 +143,33 @@
 
                         <div class="col-12">
                             <label for="select">Tipo de usuario:</label>
-                            <select class="form-select" id="select" name="Rol" required>
+                            <select class="form-select" id="select" name="Rol" >
                             </select>
                         </div>
 
+                        <input type="hidden" name="estado" value="1" id="estado"  />
+
+                        @*<div class="col-12">
+                            <label class="form-check-label" for="">
+                                Estado:
+                            </label>
+                            <div style="display:flex;justify-content:left">
+                                <div class="form-check">
+                                    <label class="form-check-label" for="F">
+                                        Activo
+                                    </label>
+                                    <input class="form-check-input" type="checkbox" id="A" checked />
+                                </div>
+
+                                <div class="form-check">
+                                    <label class="form-check-label" for="M">
+                                        Desactivado
+                                    </label>
+                                    <input class="form-check-input" type="checkbox" id="D" />
+                                </div>
+                            </div>
+
+                        </div>*@
 
                         <div class="col-12 ">
                             <button type="submit" class="btn btn-primary" data-bs-dismiss="modal" id="save">Guardar</button>
